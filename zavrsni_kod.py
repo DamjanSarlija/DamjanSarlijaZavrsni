@@ -23,13 +23,18 @@ class Kalkulator:
 
 class KalkulatorPredaje(Kalkulator):
 
-    
-
     def dodaj_statistiku(self, statistika):
         if isinstance(statistika, StatistikaPredaje):
             super().dodaj_statistiku(statistika)
         else:
             raise TypeError
+        
+    def  racunaj_statistike(self, repozitorij):
+        with open("rezultati.txt", "a", encoding="utf-8") as datoteka:
+            datoteka.write("#" * 30 + "\n")
+            datoteka.write("**PREDAJE**\n")
+            datoteka.write("#" * 30 + "\n\n")
+        return super().racunaj_statistike(repozitorij)
     
 
 class KalkulatorZahtjevi(Kalkulator):
@@ -42,6 +47,13 @@ class KalkulatorZahtjevi(Kalkulator):
         else:
             raise TypeError
         
+    def  racunaj_statistike(self, repozitorij):
+        with open("rezultati.txt", "a", encoding="utf-8") as datoteka:
+            datoteka.write("#" * 30 + "\n")
+            datoteka.write("**ZAHTJEVI**\n")
+            datoteka.write("#" * 30 + "\n\n")
+        return super().racunaj_statistike(repozitorij)
+        
 
 class KalkulatorProblemi(Kalkulator):
 
@@ -52,6 +64,13 @@ class KalkulatorProblemi(Kalkulator):
             super().dodaj_statistiku(statistika)
         else:
             raise TypeError
+        
+    def  racunaj_statistike(self, repozitorij):
+        with open("rezultati.txt", "a", encoding="utf-8") as datoteka:
+            datoteka.write("#" * 30 + "\n")
+            datoteka.write("**PROBLEMI**\n")
+            datoteka.write("#" * 30 + "\n\n")
+        return super().racunaj_statistike(repozitorij)
 
 class KalkulatorRasprave(Kalkulator):
 
@@ -73,10 +92,13 @@ class Statistika:
 
 class StatistikaPredaje(Statistika):
     pass
+        
 
 class StatistikaPredajePredaje(StatistikaPredaje):
     
     def izracunaj(self, repozitorij):
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PREDAJE::PREDAJE\n\n")
         listaPredaja = repozitorij.get_commits()
         rjecnikClanoviPredaje = {}
         for predaja in listaPredaja:
@@ -95,13 +117,21 @@ class StatistikaPredajePredaje(StatistikaPredaje):
             rjecnik = {}
             rjecnik["ime"] = kljuc
             rjecnik["broj predaja"] = rjecnikClanoviPredaje[kljuc]
-            rjecnik["postotak predaja"] = rjecnikClanoviPredaje[kljuc] / ukupnoPredaja
+            if ukupnoPredaja != 0:
+                rjecnik["postotak predaja"] = rjecnikClanoviPredaje[kljuc] / ukupnoPredaja
+            else:
+                rjecnik["postotak predaja"] = 0
             povratnaLista.append(rjecnik)
-            
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"ime: {kljuc}, broj: {rjecnikClanoviPredaje[kljuc]}, postotak: {rjecnik['postotak predaja'] * 100}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
 
 class StatistikaPredajeDodavanja(StatistikaPredaje):
     def izracunaj(self, repozitorij):
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PREDAJE::DODAVANJA\n\n")
         listaPredaja = repozitorij.get_commits()
         
         rjecnikClanoviPredaje = {}
@@ -119,15 +149,22 @@ class StatistikaPredajeDodavanja(StatistikaPredaje):
             rjecnik = {}
             rjecnik["ime"] = kljuc
             rjecnik["broj dodavanja"] = rjecnikClanoviPredaje[kljuc]
-            rjecnik["postotak dodavanja"] = rjecnikClanoviPredaje[kljuc] / ukupnoDodavanja
+            if ukupnoDodavanja != 0:
+                rjecnik["postotak dodavanja"] = rjecnikClanoviPredaje[kljuc] / ukupnoDodavanja
+            else:
+                rjecnik["postotak dodavanja"] = 0
             povratnaLista.append(rjecnik)
-
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"ime: {kljuc}, broj: {rjecnikClanoviPredaje[kljuc]}, postotak: {rjecnik['postotak dodavanja'] * 100}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
     
 class StatistikaPredajeUklanjanja(StatistikaPredaje):
     def izracunaj(self, repozitorij):
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PREDAJE::UKLANJANJA\n\n")
         listaPredaja = repozitorij.get_commits()
-        
         rjecnikClanoviPredaje = {}
         for predaja in listaPredaja:
             print("Napredak...")
@@ -144,13 +181,22 @@ class StatistikaPredajeUklanjanja(StatistikaPredaje):
             rjecnik = {}
             rjecnik["ime"] = kljuc
             rjecnik["broj uklanjanja"] = rjecnikClanoviPredaje[kljuc]
-            rjecnik["postotak uklanjanja"] = rjecnikClanoviPredaje[kljuc] / ukupnoUklanjanja
+            if (ukupnoUklanjanja != 0):
+                rjecnik["postotak uklanjanja"] = rjecnikClanoviPredaje[kljuc] / ukupnoUklanjanja
+            else:
+                rjecnik["postotak uklanjanja"] = 0
             povratnaLista.append(rjecnik)
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"ime: {kljuc}, broj: {rjecnik['broj uklanjanja']}, postotak: {rjecnik['postotak uklanjanja'] * 100}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
 
         return povratnaLista
     
 class StatistikaPredajeUkupno(StatistikaPredaje):
     def izracunaj(self, repozitorij):
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PREDAJE::UKUPNO\n\n")
         listaPredaja = repozitorij.get_commits()
         
         rjecnikClanoviPredaje = {}
@@ -169,14 +215,24 @@ class StatistikaPredajeUkupno(StatistikaPredaje):
             rjecnik = {}
             rjecnik["ime"] = kljuc
             rjecnik["broj ukupno"] = rjecnikClanoviPredaje[kljuc]
-            rjecnik["postotak ukupno"] = rjecnikClanoviPredaje[kljuc] / ukupnoUkupno
+            if ukupnoUkupno != 0:
+                rjecnik["postotak ukupno"] = rjecnikClanoviPredaje[kljuc] / ukupnoUkupno
+            else:
+                rjecnik["postotak ukupno"] = 0
             povratnaLista.append(rjecnik)
-
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"ime: {kljuc}, broj: {rjecnikClanoviPredaje[kljuc]}, postotak: {rjecnik['postotak ukupno'] * 100}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
     
 class StatistikaPredajePopis(StatistikaPredaje):
     def izracunaj(self, repozitorij):
+       
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PREDAJE::POPIS\n\n")
         listaPredaja = repozitorij.get_commits()
+        print(listaPredaja[0])
         povratnaLista = []
         for predaja in listaPredaja:
             print("Napredak...")
@@ -189,6 +245,10 @@ class StatistikaPredajePopis(StatistikaPredaje):
             rjecnik["uklanjanja"] = predaja.stats.deletions
             rjecnik["ukupno"] = predaja.stats.total
             povratnaLista.append(rjecnik)
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"sazetak: {rjecnik['sazetak']}, autor: {rjecnik['autor']}, poruka: {rjecnik['poruka']}, datum: {rjecnik['datum']}, dodavanja: {rjecnik['dodavanja']}, uklanjanja: {rjecnik['uklanjanja']}, ukupno: {rjecnik['ukupno']}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
         
     
@@ -197,6 +257,9 @@ class StatistikaZahtjevi(Statistika):
 
 class StatistikaZahtjeviPopis(StatistikaZahtjevi):
     def izracunaj(self, repozitorij):
+       
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("ZAHTJEVI::POPIS\n\n")
         listaZahtjeva = repozitorij.get_pulls()
         povratnaLista = []
         for zahtjev in listaZahtjeva:
@@ -211,10 +274,17 @@ class StatistikaZahtjeviPopis(StatistikaZahtjevi):
             rjecnik["datum spajanja"] = zahtjev.merged_at
             rjecnik["tijelo zahtjeva"] = zahtjev.body
             povratnaLista.append(rjecnik)
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"id: {rjecnik['id']}, broj: {rjecnik['broj']}, autor: {rjecnik['autor']}, status: {rjecnik['status']}, datum kreiranja: {rjecnik['datum kreiranja']}, datum zatvaranja: {rjecnik['datum zatvaranja']}, datum spajanja: {rjecnik['datum spajanja']}, tijelo zahtjeva: {rjecnik['tijelo zahtjeva']}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
     
 class StatistikaZahtjeviBroj(StatistikaZahtjevi):
     def izracunaj(self, repozitorij):
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("ZAHTJEVI::BROJ\n\n")
         listaZahtjeva = repozitorij.get_pulls()
         rjecnikClanoviOtvoreno = {}
         rjecnikClanoviZatvoreno = {}
@@ -242,6 +312,9 @@ class StatistikaZahtjeviBroj(StatistikaZahtjevi):
             else:
                 rjecnik["broj zatvorenih zahtjeva"] = 0
             povratnaLista.append(rjecnik)
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"ime: {kljuc}, broj otvorenih: {rjecnik['broj otvorenih zahtjeva']}, broj zatvorenih: {rjecnik['broj zatvorenih zahtjeva']}\n")
+        
         
         for kljuc in rjecnikClanoviZatvoreno.keys():
             
@@ -251,10 +324,17 @@ class StatistikaZahtjeviBroj(StatistikaZahtjevi):
                 rjecnik["broj otvorenih zahtjeva"] = 0
                 rjecnik["broj zatvorenih zahtjeva"] = rjecnikClanoviZatvoreno[kljuc]
                 povratnaLista.append(rjecnik)
+                with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                    datoteka.write(f"ime: {kljuc}, broj otvorenih: {rjecnik['broj otvorenih zahtjeva']}, broj zatvorenih: {rjecnik['broj zatvorenih zahtjeva']}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
     
 class StatistikaZahtjeviVrijeme(StatistikaZahtjevi):
     def izracunaj(self, repozitorij):
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("ZAHTJEVI::VRIJEME\n\n")
         listaZatvorenihZahtjeva = repozitorij.get_pulls(state = "closed")
         brojac = 0
         for p in listaZatvorenihZahtjeva:
@@ -270,10 +350,17 @@ class StatistikaZahtjeviVrijeme(StatistikaZahtjevi):
             prosjecno_sati = ukupno_sati / brojac
         else:
             return 0
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write(f"prosjecno sati: {prosjecno_sati}\n")
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return prosjecno_sati
     
 class StatistikaZahtjeviKomentari(StatistikaZahtjevi):
+    
     def izracunaj(self, repozitorij):
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("ZAHTJEVI::VRIJEME\n\n")
         listaZahtjeva = repozitorij.get_pulls()
         brojac = 0
         for p in listaZahtjeva:
@@ -286,6 +373,9 @@ class StatistikaZahtjeviKomentari(StatistikaZahtjevi):
             ukupno_komentara += broj_komentara
         if (brojac != 0):
             prosjecno_komentara = ukupno_komentara / brojac
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write(f"prosjecno komentara: {prosjecno_komentara}\n")
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return prosjecno_komentara
 
 class StatistikaProblemi(Statistika):
@@ -293,6 +383,9 @@ class StatistikaProblemi(Statistika):
 
 class StatistikaProblemiPopis(StatistikaProblemi):
     def izracunaj(self, repozitorij):
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PROBLEMI::POPIS\n\n")
         listaProblema = repozitorij.get_issues(state = "all")
         povratnaLista = []
         for problem in listaProblema:
@@ -302,12 +395,19 @@ class StatistikaProblemiPopis(StatistikaProblemi):
             rjecnik["naslov"] = problem.title
             rjecnik["stanje"] = problem.state
             povratnaLista.append(rjecnik)
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"broj: {rjecnik['broj problema']}, naslov: {rjecnik['naslov']}, stanje: {rjecnik['stanje']}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
 
 
 
 class StatistikaProblemiBroj(StatistikaProblemi):
     def izracunaj(self, repozitorij):
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PROBLEMI::BROJ\n\n")
         listaProblema = repozitorij.get_issues(state = "all")
 
         rjecnikClanoviOtvoreno = {}
@@ -337,6 +437,8 @@ class StatistikaProblemiBroj(StatistikaProblemi):
             else:
                 rjecnik["broj zatvorenih problema"] = 0
             povratnaLista.append(rjecnik)
+            with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                datoteka.write(f"ime: {kljuc}, broj otvorenih: {rjecnik['broj otvorenih problema']}, broj zatvorenih: {rjecnik['broj zatvorenih problema']}\n")
         
         for kljuc in rjecnikClanoviZatvoreno.keys():
             if kljuc not in rjecnikClanoviOtvoreno.keys():
@@ -345,10 +447,17 @@ class StatistikaProblemiBroj(StatistikaProblemi):
                 rjecnik["broj otvorenih problema"] = 0
                 rjecnik["broj zatvorenih problema"] = rjecnikClanoviZatvoreno[kljuc]
                 povratnaLista.append(rjecnik)
+                with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+                    datoteka.write(f"ime: {kljuc}, broj otvorenih: {rjecnik['broj otvorenih problema']}, broj zatvorenih: {rjecnik['broj zatvorenih problema']}\n")
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
     
 class StatistikaProblemiVrijeme(StatistikaProblemi):
     def izracunaj(self, repozitorij):
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PROBLEMI::VRIJEME\n\n")
         listaZatvorenihProblema = repozitorij.get_issues(state = "closed")
         brojac = 0
         ukupno_sati = 0
@@ -363,10 +472,16 @@ class StatistikaProblemiVrijeme(StatistikaProblemi):
             prosjecno_sati = ukupno_sati / brojac
         else:
             return 0
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write(f"prosjecno sati: {prosjecno_sati}\n")
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return prosjecno_sati
 
 class StatistikaProblemiLabele(StatistikaProblemi):
     def izracunaj(self, repozitorij):
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PROBLEMI::LABELE\n\n")
         listaProblema = repozitorij.get_issues(state = "all")
         povratniRjecnik = {}
         for problem in listaProblema:
@@ -377,10 +492,17 @@ class StatistikaProblemiLabele(StatistikaProblemi):
                     povratniRjecnik[labela.name] = 1
                 else:
                     povratniRjecnik[labela.name] += 1
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            for labela in povratniRjecnik.keys():
+                datoteka.write(f"labela: {labela}, broj: {povratniRjecnik[labela]}\n")
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratniRjecnik
     
 class StatistikaProblemiKomentari(StatistikaProblemi):
     def izracunaj(self, repozitorij):
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PROBLEMI::KOMENTARI\n\n")
         listaProblema = repozitorij.get_issues(state = "all")
         ukupno_komentara = 0
         brojac = 0
@@ -392,6 +514,9 @@ class StatistikaProblemiKomentari(StatistikaProblemi):
             prosjecno_komentara = ukupno_komentara / brojac
         else:
             return 0
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write(f"prosjecno komentara: {prosjecno_komentara}\n")
+            datoteka.write("\n" + "-" * 80 + "\n\n")
         return prosjecno_komentara
             
 
@@ -432,6 +557,7 @@ def main():
     autentifikator = Auth.Token(UNIJETI GITHUB API ACCESS TOKEN KAO STRING)
     
     g = Github(auth = autentifikator)
+    
     autentificirani_korisnik = g.get_user()
     repozitoriji = autentificirani_korisnik.get_repos()
     moj_repozitorij = repozitoriji[0]
@@ -441,7 +567,7 @@ def main():
     kalkulator_predaje = KalkulatorPredaje()
     kalkulator_zahtjevi = KalkulatorZahtjevi()
     kalkulator_problemi = KalkulatorProblemi()
-
+    
     kalkulator_predaje.dodaj_statistiku(StatistikaPredajePopis())     #Vraca popis commitova
     kalkulator_predaje.dodaj_statistiku(StatistikaPredajePredaje())            #Vraca broj commitova po korisniku te postotak od ukupnog broja po korisniku/100
     kalkulator_predaje.dodaj_statistiku(StatistikaPredajeDodavanja())        #Broj additiona i postotak od ukupnog po korisniku/100
