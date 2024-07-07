@@ -226,13 +226,22 @@ class StatistikaPredajeUkupno(StatistikaPredaje):
             datoteka.write("\n" + "-" * 80 + "\n\n")
         return povratnaLista
     
+class StatistikaPredajeBroj(StatistikaPredaje):
+    def izracunaj(self, repozitorij):
+        listaPredaja = repozitorij.get_commits()
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write("PREDAJE::BROJ\n\n")
+            datoteka.write(f"Broj predaja: {listaPredaja.totalCount}\n")
+            datoteka.write("\n" + "-" * 80 + "\n\n")
+        return listaPredaja.totalCount
+        
+    
 class StatistikaPredajePopis(StatistikaPredaje):
     def izracunaj(self, repozitorij):
        
         with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
             datoteka.write("PREDAJE::POPIS\n\n")
         listaPredaja = repozitorij.get_commits()
-        print(listaPredaja[0])
         povratnaLista = []
         for predaja in listaPredaja:
             print("Napredak...")
@@ -260,7 +269,7 @@ class StatistikaZahtjeviPopis(StatistikaZahtjevi):
        
         with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
             datoteka.write("ZAHTJEVI::POPIS\n\n")
-        listaZahtjeva = repozitorij.get_pulls()
+        listaZahtjeva = repozitorij.get_pulls(state = "all")
         povratnaLista = []
         for zahtjev in listaZahtjeva:
             print("Napredak...")
@@ -285,7 +294,7 @@ class StatistikaZahtjeviBroj(StatistikaZahtjevi):
         
         with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
             datoteka.write("ZAHTJEVI::BROJ\n\n")
-        listaZahtjeva = repozitorij.get_pulls()
+        listaZahtjeva = repozitorij.get_pulls(state = "all")
         rjecnikClanoviOtvoreno = {}
         rjecnikClanoviZatvoreno = {}
 
@@ -338,6 +347,7 @@ class StatistikaZahtjeviVrijeme(StatistikaZahtjevi):
         listaZatvorenihZahtjeva = repozitorij.get_pulls(state = "closed")
         brojac = 0
         for p in listaZatvorenihZahtjeva:
+            
             brojac += 1
         ukupno_sati = 0
         for zahtjev in listaZatvorenihZahtjeva:
@@ -349,7 +359,7 @@ class StatistikaZahtjeviVrijeme(StatistikaZahtjevi):
         if brojac != 0:
             prosjecno_sati = ukupno_sati / brojac
         else:
-            return 0
+            prosjecno_sati = "NEMA"
         with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
             datoteka.write(f"prosjecno sati: {prosjecno_sati}\n")
             datoteka.write("\n" + "-" * 80 + "\n\n")
@@ -360,8 +370,8 @@ class StatistikaZahtjeviKomentari(StatistikaZahtjevi):
     def izracunaj(self, repozitorij):
         
         with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
-            datoteka.write("ZAHTJEVI::VRIJEME\n\n")
-        listaZahtjeva = repozitorij.get_pulls()
+            datoteka.write("ZAHTJEVI::KOMENTARI\n\n")
+        listaZahtjeva = repozitorij.get_pulls(state = "all")
         brojac = 0
         for p in listaZahtjeva:
             brojac += 1
@@ -373,6 +383,8 @@ class StatistikaZahtjeviKomentari(StatistikaZahtjevi):
             ukupno_komentara += broj_komentara
         if (brojac != 0):
             prosjecno_komentara = ukupno_komentara / brojac
+        else:
+            prosjecno_komentara = "NEMA"
         with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
             datoteka.write(f"prosjecno komentara: {prosjecno_komentara}\n")
             datoteka.write("\n" + "-" * 80 + "\n\n")
@@ -471,7 +483,7 @@ class StatistikaProblemiVrijeme(StatistikaProblemi):
         if brojac != 0:
             prosjecno_sati = ukupno_sati / brojac
         else:
-            return 0
+            prosjecno_sati = "NEMA"
         with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
             datoteka.write(f"prosjecno sati: {prosjecno_sati}\n")
             datoteka.write("\n" + "-" * 80 + "\n\n")
@@ -513,7 +525,7 @@ class StatistikaProblemiKomentari(StatistikaProblemi):
         if brojac != 0:
             prosjecno_komentara = ukupno_komentara / brojac
         else:
-            return 0
+            prosjecno_komentara = "NEMA"
         with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
             datoteka.write(f"prosjecno komentara: {prosjecno_komentara}\n")
             datoteka.write("\n" + "-" * 80 + "\n\n")
@@ -554,38 +566,53 @@ class AnalizatorRepozitorija:
 
 
 def main():
-    autentifikator = Auth.Token(UNIJETI GITHUB API ACCESS TOKEN KAO STRING)
+    autentifikator = Auth.Token(UBACI TOKEN KAO STRING)
     
     g = Github(auth = autentifikator)
     
     autentificirani_korisnik = g.get_user()
     repozitoriji = autentificirani_korisnik.get_repos()
-    moj_repozitorij = repozitoriji[0]
-    
-    A = AnalizatorRepozitorija(moj_repozitorij)
+    brojac = 1
+    for repozitorij in repozitoriji:
+        moj_repozitorij = repozitorij
+        print(f"REPOZITORIJ BROJ {brojac}: {moj_repozitorij.name}")
+        
+        with open("rezultati.txt", "a", encoding = "utf-8") as datoteka:
+            datoteka.write(f"REPOZITORIJ BROJ {brojac}: {moj_repozitorij.name}\n\n")
+        print(f"Analizira se repozitorij broj {brojac}: {moj_repozitorij.name}")
 
-    kalkulator_predaje = KalkulatorPredaje()
-    kalkulator_zahtjevi = KalkulatorZahtjevi()
-    kalkulator_problemi = KalkulatorProblemi()
-    
-    kalkulator_predaje.dodaj_statistiku(StatistikaPredajePopis())     #Vraca popis commitova
-    kalkulator_predaje.dodaj_statistiku(StatistikaPredajePredaje())            #Vraca broj commitova po korisniku te postotak od ukupnog broja po korisniku/100
-    kalkulator_predaje.dodaj_statistiku(StatistikaPredajeDodavanja())        #Broj additiona i postotak od ukupnog po korisniku/100
-    kalkulator_predaje.dodaj_statistiku(StatistikaPredajeUklanjanja())       #Broj deletiona i postotak od ukupnog po korisniku/100
-    kalkulator_predaje.dodaj_statistiku(StatistikaPredajeUkupno())           #Additions + deletions
+        A = AnalizatorRepozitorija(moj_repozitorij)
 
-    kalkulator_problemi.dodaj_statistiku(StatistikaProblemiPopis())          #Popis issuea
-    kalkulator_problemi.dodaj_statistiku(StatistikaProblemiBroj())           #Broj issuea po korisniku
-    kalkulator_problemi.dodaj_statistiku(StatistikaProblemiKomentari())      #Prosjecan broj komentara na issueu
-    kalkulator_problemi.dodaj_statistiku(StatistikaProblemiVrijeme())        #Prosjecno vrijeme potrebno za zatvaranje issuea u satima
-    kalkulator_problemi.dodaj_statistiku(StatistikaProblemiLabele())         #Broj issuea po vrsti labele (bug, enhancement, ...)
-    
+        kalkulator_predaje = KalkulatorPredaje()
+        kalkulator_zahtjevi = KalkulatorZahtjevi()
+        kalkulator_problemi = KalkulatorProblemi()
+        
+        kalkulator_predaje.dodaj_statistiku(StatistikaPredajePopis())     #Vraca popis commitova
+        kalkulator_predaje.dodaj_statistiku(StatistikaPredajePredaje())            #Vraca broj commitova po korisniku te postotak od ukupnog broja po korisniku/100
+        kalkulator_predaje.dodaj_statistiku(StatistikaPredajeDodavanja())        #Broj additiona i postotak od ukupnog po korisniku/100
+        kalkulator_predaje.dodaj_statistiku(StatistikaPredajeUklanjanja())       #Broj deletiona i postotak od ukupnog po korisniku/100
+        kalkulator_predaje.dodaj_statistiku(StatistikaPredajeUkupno())       #Additions + deletions
+        kalkulator_predaje.dodaj_statistiku(StatistikaPredajeBroj())         #Broj svih commitova u cijelom repozitoriju
 
-    A.dodaj_kalkulator(kalkulator_predaje)
-    A.dodaj_kalkulator(kalkulator_problemi)
-    
-    rez = A.pokreni_kalkulatore()
+        kalkulator_zahtjevi.dodaj_statistiku(StatistikaZahtjeviPopis())
+        kalkulator_zahtjevi.dodaj_statistiku(StatistikaZahtjeviBroj())
+        kalkulator_zahtjevi.dodaj_statistiku(StatistikaZahtjeviKomentari())
+        kalkulator_zahtjevi.dodaj_statistiku(StatistikaZahtjeviVrijeme())
+        
+        kalkulator_problemi.dodaj_statistiku(StatistikaProblemiPopis())          #Popis issuea
+        kalkulator_problemi.dodaj_statistiku(StatistikaProblemiBroj())           #Broj issuea po korisniku
+        kalkulator_problemi.dodaj_statistiku(StatistikaProblemiKomentari())      #Prosjecan broj komentara na issueu
+        kalkulator_problemi.dodaj_statistiku(StatistikaProblemiVrijeme())        #Prosjecno vrijeme potrebno za zatvaranje issuea u satima
+        kalkulator_problemi.dodaj_statistiku(StatistikaProblemiLabele())         #Broj issuea po vrsti labele (bug, enhancement, ...)
+        
+        A.dodaj_kalkulator(kalkulator_predaje)
+        A.dodaj_kalkulator(kalkulator_zahtjevi)
+        A.dodaj_kalkulator(kalkulator_problemi)
+        
+        rez = A.pokreni_kalkulatore()
 
-    print(rez)
+        print(rez)
+        
+        brojac += 1
 
 main()
